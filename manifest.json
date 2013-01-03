@@ -1,0 +1,16 @@
+{
+	"name": "Quick Navigation",
+	"version": "0.1",
+	"description": "Navigate web using your keyboard without mouse.",
+	"content_scripts":[{
+  		"matches": ["http://*/*"],
+    	"js": ["jquery.js", "myscript.js"],
+    	"run_at" : "document_end"
+	}],
+	"permissions": [
+  		"tabs",
+		"http://*/*"
+  	],
+
+  	"manifest_version": 2
+}
