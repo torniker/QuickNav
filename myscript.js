@@ -54,3 +54,146 @@ window.onkeyup = function(e) {
 		input.hide();
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*$(document).ready(function() {
+	var val = '';
+	var input;
+	var a = $('a');
+	var found = false;
+	var index = 0;
+	var num;
+
+	
+	$(document).keypress(function(e) {
+		if(e.ctrlKey == true && e.charCode == 113 || e.charCode == 17) {
+			console.log('asdas');
+			if(typeof input == 'undefined') {
+				console.log('das');
+				var newInput = document.createElement("input");
+				newInput.type='text';
+				newInput.id = 'quicknav';
+				newInput.style.cssText = 'position: fixed; top: 20px; left:20px; width:150px';
+				console.log(newInput);
+				$('body').append(newInput);
+				input = $('#quicknav');
+				input.keyup(changeListener);
+				input.focus();
+				//input.val(String.fromCharCode(e.charCode));
+			}
+		}
+		
+		inputControls(e);
+	});
+
+	var inputControls = function (e) {
+		if(input) {
+			switch(e.keyCode) {
+				case 13 : goToURL(); break;
+				case 27 : disableQuickNav(); break;
+				case 40 : 
+					index++; 
+					if(index>num) { index = 0; }
+					findNext(); 
+					break;
+				case 38 : 
+				console.log(num);
+					if(index==0) { index = num; }
+					if(index>0) { index--; } 
+					findNext(); 
+					break;
+			}
+		}
+	}
+
+	var changeListener = function(e) {
+		findNext(input.val());
+		inputControls(e);
+	}
+
+
+	var findNext = function(str) {
+		var re = new RegExp(str,"gi");
+		var n;
+		var j = 0;
+		found = false;
+		
+		for(i=0;i<a.length;i++) {
+			str = $(a[i]).html();
+			n = str.match(re);
+			if(n) {
+				if(index == j) {
+					found = $(a[i]);
+					found.css('backgroundColor','#444');
+					found.css('color','#FFF');
+					var pos = found.offset();
+					var from = scrollTop();
+					var to = from + docHeight();
+					if(pos.top < from || pos.top > to) {
+						speed = Math.abs(pos.top - from);
+						$('html, body').animate({
+					         scrollTop: pos.top - 100
+					     }, speed);
+					}
+				} else {
+					$(a[i]).css('background','none');
+				}
+				j++;
+			} else {
+				$(a[i]).css('background','none');
+			}
+		}
+		num = j;
+	}
+
+	var goToURL = function() {
+		if(found) {
+			if(found.attr('href')) {
+				document.location.href = found.attr('href');
+			}
+		}
+	}
+
+	var disableQuickNav = function() {
+		input.remove();
+		input = false;
+		found = false;
+		index = 0;
+		findNext('');
+	}
+
+	var docHeight = function() {
+	    var e = window, a = 'inner';
+		if ( !( 'innerWidth' in window )){
+			a = 'client';
+			e = document.documentElement || document.body;
+		}
+		obj = { width : e[ a+'Width' ] , height : e[ a+'Height' ] }
+		return obj.height;
+	}
+
+	var scrollTop = function(){
+	    if(typeof pageYOffset!= 'undefined'){
+	        return pageYOffset;
+	    } else {
+	        var B = document.body; //IE 'quirks'
+	        var D = document.documentElement; //IE with doctype
+	        D= (D.clientHeight)? D: B;
+	        return D.scrollTop;
+	    }
+	}
+
+});*/
