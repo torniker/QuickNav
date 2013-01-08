@@ -3,16 +3,17 @@
 	var val = '';
 	var input;
 	var a = document.getElementsByTagName('a');
-	var found = false;
+	var found = [];
 	var index = 0;
 	var num;
+	var prev;
 
 	window.onkeyup = function(e) {
 		if(e.ctrlKey == true && e.keyCode == 190) {
 			if(typeof input == 'undefined') {
 				input = document.createElement("input");
 				input.type='text';
-				input.style.cssText = 'position: fixed; top: 20px; left:20px; width:200px; border:1px #eee solid;';
+				input.style.cssText = 'position: fixed; top: 20px; left:20px; width:200px; border:1px #eee solid; padding:5px;';
 				input.onkeyup = changeListener;
 				document.body.appendChild(input);
 				input.focus();
@@ -23,7 +24,8 @@
 	}
 
 	var changeListener = function(e) {
-		findNext(input.value);
+		removeSelection();
+		findAll(input.value);
 		inputControls(e);
 	}
 
@@ -33,72 +35,80 @@
 				case 13 : goToURL(); break;
 				case 27 : disableQuickNav(); break;
 				case 40 : 
+					removeSelection();
 					index++; 
 					if(index>num) { index = 0; }
-					findNext(); 
+					selectFound(); 
 					break;
 				case 38 : 
+					removeSelection();
 					if(index==0) { index = num; }
 					if(index>0) { index--; } 
-					findNext(); 
+					selectFound(); 
 					break;
 			}
 		}
 	}
 
-	var findNext = function(str) {
+	var findAll = function(str) {
 		var re = new RegExp(str,"gi");
 		var n;
 		var j = 0;
-		found = false;
-		
+		console.log(typeof found);
+		found = [];
 		for(i=0;i<a.length;i++) {
 			str = a[i].text;
 			n = str.match(re);
 			if(n) {
-				if(index == j) {
-
-					found = a[i];
-					console.log(typeof a[i]);
-					found.style.cssText = 'background:#444; color:#fff ';
-
-					console.log(found);
-					var pos = found.offset();
-					var from = scrollTop();
-					var to = from + docHeight();
-					if(pos.top < from || pos.top > to) {
-						speed = Math.abs(pos.top - from);
-						$('html, body').animate({
-					         scrollTop: pos.top - 100
-					     }, speed);
-					}
-				} else {
-					$(a[i]).css('background','none');
-				}
+				found[j] = a[i];
 				j++;
-			} else {
-				$(a[i]).css('background','none');
 			}
 		}
 		num = j;
+		selectFound();
+	}
+
+	var selectFound = function() {
+		if(!found[index]) {
+			removeSelection();
+			return;
+		}
+
+		prev = found[index];
+		found[index].style.background = '#444';
+
+		var pos = found[index].offsetTop;
+		var from = scrollTop();
+		var to = from + docHeight();
+		if(pos < from || pos > to) {
+			speed = Math.abs(pos - from);
+			$('html, body').animate({
+		         scrollTop: pos - 100
+		     }, speed);
+		}
+	}
+
+	var removeSelection = function() {
+		found[index] = prev;
 	}
 
 	var goToURL = function() {
-		if(found) {
-			if(found.attr('href')) {
-				document.location.href = found.attr('href');
+		if(typeof found != 'undefined') {
+			if(found.href) {
+				document.location.href = found.href;
 			}
 		}
 	}
 
 	var disableQuickNav = function() {
-		found = false;
+		removeSelection();
+		found = [];
 		index = 0;
 		if(typeof input != 'undefined') {
-			document.body.removeChild(input.obj);
+			document.body.removeChild(input);
 			delete input;
 		}
-		findNext('');
+		findAll('');
 	}
 
 	var docHeight = function() {
@@ -117,7 +127,7 @@
 	    } else {
 	        var B = document.body; //IE 'quirks'
 	        var D = document.documentElement; //IE with doctype
-	        D= (D.clientHeight)? D: B;
+	        D = (D.clientHeight)? D: B;
 	        return D.scrollTop;
 	    }
 	}
