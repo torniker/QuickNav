@@ -3,13 +3,15 @@
 	"version": "0.1",
 	"description": "Navigate web using your keyboard without mouse.",
 	"content_scripts":[{
-  		"matches": ["http://*/*"],
+  		"matches": ["http://*/*","https://*/*"],
     	"js": ["jquery.js", "myscript.js"],
+    	"css" : ["mystyle.css"],
     	"run_at" : "document_end"
 	}],
 	"permissions": [
   		"tabs",
-		"http://*/*"
+		"http://*/*",
+		"https://*/*"
   	],
 
   	"manifest_version": 2

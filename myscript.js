@@ -1,21 +1,29 @@
 (function() { 
 
 	var val = '';
-	var input;
+	var input = null;
+	var div = null;
 	var a = document.getElementsByTagName('a');
 	var found = [];
 	var index = 0;
 	var num;
-	var prev;
+	var prev = {};
+
+	var suggestionsUl = null;
 
 	window.onkeyup = function(e) {
 		if(e.ctrlKey == true && e.keyCode == 190) {
-			if(typeof input == 'undefined') {
+			if(div == null) {
+				div = document.createElement("div");
+				div.className = '_quicknav_container';
 				input = document.createElement("input");
 				input.type='text';
-				input.style.cssText = 'position: fixed; top: 20px; left:20px; width:200px; border:1px #eee solid; padding:5px;';
 				input.onkeyup = changeListener;
-				document.body.appendChild(input);
+				div.appendChild(input);
+				
+				suggestionsUl = document.createElement("ul");
+				div.appendChild(suggestionsUl);
+				document.body.appendChild(div);
 				input.focus();
 			}
 		}
@@ -24,9 +32,11 @@
 	}
 
 	var changeListener = function(e) {
-		removeSelection();
-		findAll(input.value);
-		inputControls(e);
+		if(e.keyCode != 40 && e.keyCode != 38  && e.keyCode != 27 && e.keyCode != 13) {
+			removeSelection();
+			findAll(input.value);
+			inputControls(e);
+		}
 	}
 
 	var inputControls = function (e) {
@@ -37,7 +47,7 @@
 				case 40 : 
 					removeSelection();
 					index++; 
-					if(index>num) { index = 0; }
+					if(index>=num) { index = 0; }
 					selectFound(); 
 					break;
 				case 38 : 
@@ -51,21 +61,63 @@
 	}
 
 	var findAll = function(str) {
+		$(suggestionsUl).find('li').remove();
 		var re = new RegExp(str,"gi");
 		var n;
 		var j = 0;
-		console.log(typeof found);
 		found = [];
 		for(i=0;i<a.length;i++) {
 			str = a[i].text;
 			n = str.match(re);
-			if(n) {
+			if(n && str != '') {
 				found[j] = a[i];
 				j++;
 			}
 		}
 		num = j;
+		showSuggestions();
 		selectFound();
+	}
+
+	var showSuggestions = function() {		
+		for(i=0;i<found.length;i++) {
+			var li = $('<li>');
+			var lia = $('<a>');
+			var liaspan = $('<span>');
+			var text = $(found[i]).text();
+			var title = $(found[i]).attr('title');
+			var href = $(found[i]).attr('href');
+
+			lia.attr('href',href);
+
+			if(text == 'About') {
+				console.log(title);
+			}
+			if(title == '' || typeof title == 'undefined' || text == title) {
+				liaspan.text(href);
+			} else {
+				liaspan.text(title);
+			}	
+			lia.text(text);
+			lia.append(liaspan);
+			li.append(lia);
+			$(suggestionsUl).append(li);
+		}
+
+		console.log(suggestionsUl);
+		
+	}
+
+	var ObjectPosition = function(obj) {
+	    var curleft = 0;
+	      var curtop = 0;
+	      if (obj.offsetParent) {
+	            do {
+	                  curleft += obj.offsetLeft;
+	                  curtop += obj.offsetTop;
+	            } while (obj = obj.offsetParent);
+	      }
+	      return curtop;
 	}
 
 	var selectFound = function() {
@@ -73,11 +125,24 @@
 			removeSelection();
 			return;
 		}
+	
+		prev.bg 			= found[index].style.background;
+		prev.color 			= found[index].style.color;
+		prev.textDecoration = found[index].style.textDecoration;
+		found[index].style.background 		= '#444';
+		found[index].style.color 			= '#fff';
+		found[index].style.textDecoration 	= 'none';
+		prev.display = found[index].style.display;
 
-		prev = found[index];
-		found[index].style.background = '#444';
+		console.log(found[index]);
 
-		var pos = found[index].offsetTop;
+		$(suggestionsUl).find('li').removeClass('_quick_selected');
+		$(suggestionsUl).find('li:eq('+index+')').addClass('_quick_selected');
+		if(!found[index].style.display.match('block')) {
+			found[index].style.display = 'inline-block';
+		}
+
+		var pos = ObjectPosition(found[index]);
 		var from = scrollTop();
 		var to = from + docHeight();
 		if(pos < from || pos > to) {
@@ -89,13 +154,19 @@
 	}
 
 	var removeSelection = function() {
-		found[index] = prev;
+		if(typeof found[index] == 'object') {
+			found[index].style.background 		= prev.bg;
+			found[index].style.display 			= prev.display;
+			found[index].style.color 			= prev.color;
+			found[index].style.textDecoration 	= prev.textDecoration;
+			//inset 0 0 15px -1px black
+		}
 	}
 
 	var goToURL = function() {
 		if(typeof found != 'undefined') {
-			if(found.href) {
-				document.location.href = found.href;
+			if(found[index].href) {
+				document.location.href = found[index].href;
 			}
 		}
 	}
@@ -104,9 +175,9 @@
 		removeSelection();
 		found = [];
 		index = 0;
-		if(typeof input != 'undefined') {
-			document.body.removeChild(input);
-			delete input;
+		if(div != null) {
+			document.body.removeChild(div);
+			div = null;
 		}
 		findAll('');
 	}
@@ -125,8 +196,8 @@
 	    if(typeof pageYOffset!= 'undefined') {
 	        return pageYOffset;
 	    } else {
-	        var B = document.body; //IE 'quirks'
-	        var D = document.documentElement; //IE with doctype
+	        var B = document.body;
+	        var D = document.documentElement;
 	        D = (D.clientHeight)? D: B;
 	        return D.scrollTop;
 	    }
