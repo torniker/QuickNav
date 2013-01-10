@@ -6,7 +6,6 @@
 	width:400px;
 	padding:4px;
 	background: #404040;
-
 }
 ._quicknav_container input {
 	width:100%;
@@ -30,6 +29,7 @@
 	padding:5px; 
 	margin:0px; 
 	list-style:none;
+	overflow: auto;
 }
 
 ._quicknav_container ul li a {

@@ -1,7 +1,7 @@
 {
 	"name": "Quick Navigation",
-	"version": "0.1",
-	"description": "Navigate web using your keyboard without mouse.",
+	"version": "0.7",
+	"description": "Navigate web using your keyboard without mouse. use ctrl+> to navigate and start typing",
 	"content_scripts":[{
   		"matches": ["http://*/*","https://*/*"],
     	"js": ["jquery.js", "myscript.js"],
